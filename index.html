@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>花蓮縣地政轄區查詢系統</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-teal-700 text-white py-6 shadow-md">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-3 mb-2">
+                <i data-lucide="map-pin" class="w-8 h-8 text-yellow-300"></i>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-wide">花蓮縣地政管轄查詢系統</h1>
+            </div>
+            <p class="text-teal-100 text-sm md:text-base">
+                收錄 2025 年最新地段代碼表，輸入地段或鄉鎮即可查詢
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-2xl">
+        
+        <!-- Search Input -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+            <label class="block text-gray-700 text-sm font-bold mb-2 ml-1">
+                請輸入地段名 (如: 民生、太巴塱) 或 鄉鎮名 (如: 吉安)
+            </label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="block w-full pl-10 pr-3 py-4 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out text-lg"
+                    placeholder="例如：壽豐、赤科山、六十石山..."
+                />
+            </div>
+            
+            <!-- Quick Tags -->
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="text-xs text-gray-500 self-center mr-1">熱門查詢：</span>
+                <button onclick="setSearch('花蓮市')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">花蓮市</button>
+                <button onclick="setSearch('壽豐')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">壽豐</button>
+                <button onclick="setSearch('鳳林')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">鳳林</button>
+                <button onclick="setSearch('太巴塱')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">太巴塱</button>
+                <button onclick="setSearch('玉里')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">玉里</button>
+                <button onclick="setSearch('六十石山')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">六十石山</button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="hidden space-y-6 fade-in-up">
+            <!-- Content will be injected here via JS -->
+        </div>
+
+        <!-- Default/No Result View -->
+        <div id="defaultContainer" class="text-center py-10 fade-in-up">
+            
+            <!-- Suggestion Box -->
+            <div id="suggestionBox" class="hidden bg-orange-50 text-orange-800 p-4 rounded-xl inline-block text-left max-w-sm border border-orange-100 shadow-sm mb-8">
+                <p class="flex items-center gap-2 font-bold mb-1"><i data-lucide="info" class="w-4 h-4"></i> 提示：</p>
+                <p class="text-sm" id="suggestionText"></p>
+            </div>
+
+            <div id="emptyStateIcon" class="text-gray-400">
+                <i data-lucide="building-2" class="w-16 h-16 mx-auto mb-4 opacity-20"></i>
+                <p>輸入上方關鍵字開始查詢</p>
+            </div>
+            
+            <!-- Jurisdiction Reference Table -->
+            <div class="mt-12 text-left">
+                <h3 class="text-lg font-bold text-gray-700 mb-4 border-l-4 border-teal-500 pl-3">全縣轄區對照表 (2025 更新)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="officeList">
+                    <!-- Office list will be generated by JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm">
+        <p>花蓮縣地政便民查詢系統 (非官方模擬展示)</p>
+        <p class="mt-1 text-xs">資料來源：花蓮/鳳林/玉里地政事務所 114年段別代碼表</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 資料設定 ---
+        const offices = [
+            {
+                id: 'hualien',
+                name: '花蓮地政事務所',
+                areas: ['花蓮市', '吉安鄉', '新城鄉', '秀林鄉', '壽豐鄉'],
+                address: '970 花蓮市府後路23號',
+                phone: '03-822-5135',
+                mapLink: 'https://goo.gl/maps/HualienLandOffice',
+                website: 'https://hlland.hla.gov.tw/',
+                color: 'bg-blue-600',
+                lightColor: 'bg-blue-50',
+                borderColor: 'border-blue-200'
+            },
+            {
+                id: 'fenglin',
+                name: '鳳林地政事務所',
+                areas: ['鳳林鎮', '光復鄉', '豐濱鄉', '萬榮鄉'],
+                address: '975 花蓮縣鳳林鎮光華路1號',
+                phone: '03-876-1100',
+                mapLink: 'https://goo.gl/maps/FenglinLandOffice',
+                website: 'https://flland.hla.gov.tw/',
+                color: 'bg-green-600',
+                lightColor: 'bg-green-50',
+                borderColor: 'border-green-200'
+            },
+            {
+                id: 'yuli',
+                name: '玉里地政事務所',
+                areas: ['玉里鎮', '瑞穗鄉', '富里鄉', '卓溪鄉'],
+                address: '981 花蓮縣玉里鎮莊敬路18號',
+                phone: '03-888-3171',
+                mapLink: 'https://goo.gl/maps/YuliLandOffice',
+                website: 'https://ylland.hla.gov.tw/',
+                color: 'bg-orange-600',
+                lightColor: 'bg-orange-50',
+                borderColor: 'border-orange-200'
+            }
+        ];
+
+        // 地段資料庫 (包含從 PDF 提取的資料)
+        const sectionDatabase = [
+            // --- 花蓮地政事務所 ---
+            // 花蓮市
+            { n: '豐村', a: '花蓮市' }, { n: '德興', a: '花蓮市' }, { n: '嘉禾', a: '花蓮市' }, { n: '主商', a: '花蓮市' }, 
+            { n: '福安', a: '花蓮市' }, { n: '主權', a: '花蓮市' }, { n: '民生', a: '花蓮市' }, { n: '福祥', a: '花蓮市' }, 
+            { n: '福德', a: '花蓮市' }, { n: '北濱', a: '花蓮市' }, { n: '林森', a: '花蓮市' }, { n: '國風', a: '花蓮市' }, 
+            { n: '德安', a: '花蓮市' }, { n: '美港', a: '花蓮市' }, { n: '明義', a: '花蓮市' }, { n: '民享', a: '花蓮市' }, 
+            { n: '富國', a: '花蓮市' }, { n: '民意', a: '花蓮市' }, { n: '民勤', a: '花蓮市' }, { n: '民心', a: '花蓮市' }, 
+            { n: '樹人', a: '花蓮市' }, { n: '民德', a: '花蓮市' }, { n: '自強', a: '花蓮市' }, { n: '莊敬', a: '花蓮市' }, 
+            { n: '裕民', a: '花蓮市' }, { n: '碧雲', a: '花蓮市' }, { n: '國光', a: '花蓮市' }, { n: '花蓮港', a: '花蓮市' }, 
+            { n: '美崙', a: '花蓮市' }, { n: '民孝', a: '花蓮市' }, { n: '國民', a: '花蓮市' }, { n: '國股', a: '花蓮市' }, 
+            { n: '國強', a: '花蓮市' }, { n: '國興', a: '花蓮市' }, { n: '慈濟', a: '花蓮市' }, { n: '四維', a: '花蓮市' }, 
+            { n: '功學', a: '花蓮市' }, { n: '慈雲', a: '花蓮市' }, { n: '石壁', a: '花蓮市' }, { n: '國福', a: '花蓮市' },
+            // 吉安鄉
+            { n: '吉安', a: '吉安鄉' }, { n: '田浦', a: '吉安鄉' }, { n: '南埔', a: '吉安鄉' }, { n: '化仁', a: '吉安鄉' }, 
+            { n: '廣榮', a: '吉安鄉' }, { n: '宜昌', a: '吉安鄉' }, { n: '慈安', a: '吉安鄉' }, { n: '仁禮', a: '吉安鄉' }, 
+            { n: '仁義', a: '吉安鄉' }, { n: '宜安', a: '吉安鄉' }, { n: '宜寧', a: '吉安鄉' }, { n: '仁廉', a: '吉安鄉' }, 
+            { n: '仁恥', a: '吉安鄉' }, { n: '太昌', a: '吉安鄉' }, { n: '慶豐', a: '吉安鄉' }, { n: '福興', a: '吉安鄉' }, 
+            { n: '稻香', a: '吉安鄉' }, { n: '慈勝', a: '吉安鄉' }, { n: '慈惠', a: '吉安鄉' }, { n: '吉興', a: '吉安鄉' }, 
+            { n: '稻園', a: '吉安鄉' }, { n: '光華', a: '吉安鄉' }, { n: '永安', a: '吉安鄉' }, { n: '永興', a: '吉安鄉' }, 
+            { n: '福吉', a: '吉安鄉' }, { n: '福南', a: '吉安鄉' }, { n: '華興', a: '吉安鄉' }, { n: '南華', a: '吉安鄉' }, 
+            { n: '草芬', a: '吉安鄉' }, { n: '干城', a: '吉安鄉' }, { n: '廣賢', a: '吉安鄉' }, { n: '東昌', a: '吉安鄉' }, 
+            { n: '光中', a: '吉安鄉' }, { n: '仁和', a: '吉安鄉' }, { n: '仁愛', a: '吉安鄉' }, { n: '光明', a: '吉安鄉' }, 
+            { n: '初音', a: '吉安鄉' }, { n: '志平', a: '吉安鄉' }, { n: '東華', a: '吉安鄉' }, { n: '平和', a: '吉安鄉' },
+            // 壽豐鄉
+            { n: '壽豐', a: '壽豐鄉' }, { n: '豐田', a: '壽豐鄉' }, { n: '志學', a: '壽豐鄉' }, { n: '治平', a: '壽豐鄉' }, 
+            { n: '月眉', a: '壽豐鄉' }, { n: '水建', a: '壽豐鄉' }, { n: '豐坪', a: '壽豐鄉' }, { n: '豐山', a: '壽豐鄉' }, 
+            { n: '鹽寮', a: '壽豐鄉' }, { n: '共和', a: '壽豐鄉' }, { n: '沼田', a: '壽豐鄉' }, { n: '樹林', a: '壽豐鄉' }, 
+            { n: '芳寮', a: '壽豐鄉' }, { n: '壽月', a: '壽豐鄉' }, { n: '潭北', a: '壽豐鄉' }, { n: '池南', a: '壽豐鄉' }, 
+            { n: '荖溪', a: '壽豐鄉' }, { n: '山嶺', a: '壽豐鄉' }, { n: '牛山', a: '壽豐鄉' }, { n: '溪口', a: '壽豐鄉' }, 
+            { n: '米棧', a: '壽豐鄉' }, { n: '鯉魚潭', a: '壽豐鄉' }, { n: '溪南', a: '壽豐鄉' }, { n: '水源', a: '壽豐鄉' }, 
+            { n: '壽農', a: '壽豐鄉' }, { n: '豐裡', a: '壽豐鄉' }, { n: '壽山', a: '壽豐鄉' }, { n: '豐東', a: '壽豐鄉' },
+            // 新城鄉
+            { n: '新城', a: '新城鄉' }, { n: '北埔', a: '新城鄉' }, { n: '加禮', a: '新城鄉' }, { n: '平野', a: '新城鄉' }, 
+            { n: '中正', a: '新城鄉' }, { n: '嘉平', a: '新城鄉' }, { n: '嘉新', a: '新城鄉' }, { n: '崇德', a: '新城鄉' }, 
+            { n: '嘉北', a: '新城鄉' }, { n: '佳林', a: '新城鄉' }, { n: '合歡', a: '新城鄉' }, { n: '景美', a: '新城鄉' }, 
+            { n: '三棧', a: '新城鄉' }, { n: '天祥', a: '新城鄉' }, { n: '順安', a: '新城鄉' }, { n: '佳民', a: '新城鄉' }, 
+            { n: '新興', a: '新城鄉' }, { n: '康樂', a: '新城鄉' }, { n: '大漢', a: '新城鄉' }, { n: '佳山', a: '新城鄉' },
+            // 秀林鄉
+            { n: '秀林', a: '秀林鄉' }, { n: '富世', a: '秀林鄉' }, { n: '和平', a: '秀林鄉' }, { n: '洛韶', a: '秀林鄉' }, 
+            { n: '慈恩', a: '秀林鄉' }, { n: '嘉南', a: '秀林鄉' }, { n: '清水', a: '秀林鄉' }, { n: '東升', a: '秀林鄉' }, 
+            { n: '榕樹', a: '秀林鄉' }, { n: '銅門', a: '秀林鄉' }, { n: '文蘭', a: '秀林鄉' }, { n: '重光', a: '秀林鄉' }, 
+            { n: '水源', a: '秀林鄉' }, { n: '關原', a: '秀林鄉' }, { n: '松雪樓', a: '秀林鄉' }, { n: '天祥', a: '秀林鄉' }, 
+            { n: '西寶', a: '秀林鄉' },
+
+            // --- 鳳林地政事務所 ---
+            // 鳳林鎮
+            { n: '鳳林', a: '鳳林鎮' }, { n: '林田', a: '鳳林鎮' }, { n: '山興', a: '鳳林鎮' }, { n: '萬里橋', a: '鳳林鎮' }, 
+            { n: '榮東', a: '鳳林鎮' }, { n: '榮花', a: '鳳林鎮' }, { n: '榮發', a: '鳳林鎮' }, { n: '鳳仁', a: '鳳林鎮' }, 
+            { n: '鳳光', a: '鳳林鎮' }, { n: '鳳明', a: '鳳林鎮' }, { n: '榮開', a: '鳳林鎮' }, { n: '榮昌', a: '鳳林鎮' }, 
+            { n: '石門', a: '鳳林鎮' }, { n: '長橋', a: '鳳林鎮' }, { n: '中心埔', a: '鳳林鎮' }, { n: '中興', a: '鳳林鎮' }, 
+            { n: '箭瑛', a: '鳳林鎮' }, { n: '兆豐', a: '鳳林鎮' }, { n: '森榮', a: '鳳林鎮' },
+            // 光復鄉
+            { n: '光復', a: '光復鄉' }, { n: '大安', a: '光復鄉' }, { n: '大平', a: '光復鄉' }, { n: '大富', a: '光復鄉' }, 
+            { n: '富田', a: '光復鄉' }, { n: '東富', a: '光復鄉' }, { n: '太巴塱', a: '光復鄉' }, { n: '溪州', a: '光復鄉' }, 
+            { n: '砂荖', a: '光復鄉' }, { n: '西富', a: '光復鄉' }, { n: '馬佛', a: '光復鄉' }, { n: '林榮', a: '光復鄉' }, 
+            { n: '大榮', a: '光復鄉' }, { n: '鳳信', a: '光復鄉' }, { n: '南平', a: '光復鄉' }, { n: '大馬', a: '光復鄉' }, 
+            { n: '大全', a: '光復鄉' }, { n: '大豐', a: '光復鄉' }, { n: '大和', a: '光復鄉' }, { n: '大興', a: '光復鄉' }, 
+            { n: '富豐', a: '光復鄉' }, { n: '加里洞', a: '光復鄉' }, { n: '大農', a: '光復鄉' },
+            // 豐濱鄉
+            { n: '豐濱', a: '豐濱鄉' }, { n: '新社', a: '豐濱鄉' }, { n: '臨海', a: '豐濱鄉' }, { n: '海濱', a: '豐濱鄉' }, 
+            { n: '石梯', a: '豐濱鄉' }, { n: '大港口', a: '豐濱鄉' }, { n: '靜浦', a: '豐濱鄉' }, { n: '新豐', a: '豐濱鄉' }, 
+            { n: '東興', a: '豐濱鄉' }, { n: '豐義', a: '豐濱鄉' }, { n: '磯崎', a: '豐濱鄉' }, { n: '八里灣', a: '豐濱鄉' },
+            // 萬榮鄉
+            { n: '萬榮', a: '萬榮鄉' }, { n: '西林', a: '萬榮鄉' }, { n: '見晴', a: '萬榮鄉' }, { n: '明利', a: '萬榮鄉' }, 
+            { n: '馬遠', a: '萬榮鄉' }, { n: '紅葉', a: '萬榮鄉' }, { n: '萬安', a: '萬榮鄉' }, { n: '馬太鞍', a: '萬榮鄉' }, 
+            { n: '支亞干', a: '萬榮鄉' },
+
+            // --- 玉里地政事務所 ---
+            // 玉里鎮
+            { n: '玉里', a: '玉里鎮' }, { n: '三民', a: '玉里鎮' }, { n: '大禹', a: '玉里鎮' }, { n: '玉昌', a: '玉里鎮' }, 
+            { n: '玉璞', a: '玉里鎮' }, { n: '玉城', a: '玉里鎮' }, { n: '玉泉', a: '玉里鎮' }, { n: '春日', a: '玉里鎮' }, 
+            { n: '觀音山', a: '玉里鎮' }, { n: '樂合', a: '玉里鎮' }, { n: '長良', a: '玉里鎮' }, { n: '源城', a: '玉里鎮' }, 
+            { n: '三義', a: '玉里鎮' }, { n: '東豐', a: '玉里鎮' }, { n: '禹東', a: '玉里鎮' }, { n: '松浦', a: '玉里鎮' }, 
+            { n: '禹北', a: '玉里鎮' }, { n: '大山', a: '玉里鎮' }, { n: '玉東', a: '玉里鎮' }, { n: '酸柑', a: '玉里鎮' }, 
+            { n: '禹中', a: '玉里鎮' }, { n: '禹西', a: '玉里鎮' }, { n: '民北', a: '玉里鎮' }, { n: '民南', a: '玉里鎮' }, 
+            { n: '永良', a: '玉里鎮' }, { n: '赤科山', a: '玉里鎮' }, { n: '石崗山', a: '玉里鎮' }, { n: '安通山', a: '玉里鎮' }, 
+            { n: '德武', a: '玉里鎮' }, { n: '神農', a: '玉里鎮' }, { n: '泰林', a: '玉里鎮' }, { n: '高寮', a: '玉里鎮' }, 
+            { n: '玉珠', a: '玉里鎮' }, { n: '哈拉灣', a: '玉里鎮' }, { n: '安坐', a: '玉里鎮' }, { n: '宮前', a: '玉里鎮' }, 
+            { n: '神社', a: '玉里鎮' }, { n: '舊田', a: '玉里鎮' }, { n: '水源', a: '玉里鎮' },
+            // 瑞穗鄉
+            { n: '瑞穗', a: '瑞穗鄉' }, { n: '富源', a: '瑞穗鄉' }, { n: '富興', a: '瑞穗鄉' }, { n: '鶴岡', a: '瑞穗鄉' }, 
+            { n: '舞鶴', a: '瑞穗鄉' }, { n: '奇美', a: '瑞穗鄉' }, { n: '瑞燕', a: '瑞穗鄉' }, { n: '瑞美', a: '瑞穗鄉' }, 
+            { n: '瑞泉', a: '瑞穗鄉' }, { n: '瑞新', a: '瑞穗鄉' }, { n: '瑞良', a: '瑞穗鄉' }, { n: '瑞強', a: '瑞穗鄉' }, 
+            { n: '掃叭頂', a: '瑞穗鄉' }, { n: '大奇山', a: '瑞穗鄉' }, { n: '瑞北', a: '瑞穗鄉' }, { n: '瑞祥', a: '瑞穗鄉' }, 
+            { n: '溫泉', a: '瑞穗鄉' }, { n: '青蓮', a: '瑞穗鄉' }, { n: '梧繞', a: '瑞穗鄉' },
+            // 富里鄉
+            { n: '富里', a: '富里鄉' }, { n: '大里', a: '富里鄉' }, { n: '東竹', a: '富里鄉' }, { n: '公埔', a: '富里鄉' }, 
+            { n: '太平', a: '富里鄉' }, { n: '明里', a: '富里鄉' }, { n: '石牌', a: '富里鄉' }, { n: '中興', a: '富里鄉' }, 
+            { n: '中平', a: '富里鄉' }, { n: '富安', a: '富里鄉' }, { n: '安通', a: '富里鄉' }, { n: '富農', a: '富里鄉' }, 
+            { n: '吳江', a: '富里鄉' }, { n: '大庄', a: '富里鄉' }, { n: '東里', a: '富里鄉' }, { n: '農場', a: '富里鄉' }, 
+            { n: '萬寧', a: '富里鄉' }, { n: '學園', a: '富里鄉' }, { n: '竹田', a: '富里鄉' }, { n: '學田', a: '富里鄉' }, 
+            { n: '永豐', a: '富里鄉' }, { n: '豐南', a: '富里鄉' }, { n: '姆拉丁', a: '富里鄉' }, { n: '羅山', a: '富里鄉' },
+            { n: '鱉溪', a: '富里鄉' }, { n: '吉拉米代', a: '富里鄉' }, { n: '泥火山', a: '富里鄉' }, { n: '六十石山', a: '富里鄉' },
+            // 卓溪鄉
+            { n: '卓溪', a: '卓溪鄉' }, { n: '崙山', a: '卓溪鄉' }, { n: '立山', a: '卓溪鄉' }, { n: '山里', a: '卓溪鄉' }, 
+            { n: '太平', a: '卓溪鄉' }, { n: '卓樂', a: '卓溪鄉' }, { n: '清水', a: '卓溪鄉' }, { n: '古風', a: '卓溪鄉' }, 
+            { n: '石平', a: '卓溪鄉' }, { n: '新生', a: '卓溪鄉' }, { n: '鹿鳴', a: '卓溪鄉' }, { n: '瓦拉米', a: '卓溪鄉' }, 
+            { n: '南安', a: '卓溪鄉' }, { n: '崙天', a: '卓溪鄉' }, { n: '白端', a: '卓溪鄉' }
+        ];
+
+        // --- DOM 元素 ---
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const defaultContainer = document.getElementById('defaultContainer');
+        const suggestionBox = document.getElementById('suggestionBox');
+        const suggestionText = document.getElementById('suggestionText');
+        const officeListContainer = document.getElementById('officeList');
+        const emptyStateIcon = document.getElementById('emptyStateIcon');
+
+        // --- 初始化頁面 ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderOfficeList();
+            lucide.createIcons();
+            
+            searchInput.addEventListener('input', handleSearch);
+        });
+
+        // 搜尋處理邏輯
+        function handleSearch(e) {
+            const rawTerm = e.target.value;
+            const term = rawTerm.trim().replace('台', '臺');
+            const displayTerm = rawTerm.trim();
+            
+            if (!displayTerm) {
+                showDefaultView();
+                return;
+            }
+
+            let results = [];
+            let suggestion = null;
+
+            // 1. 優先檢查行政區
+            const officeByArea = offices.find(office => 
+                office.areas.some(area => area.includes(term) || area.includes(displayTerm))
+            );
+
+            if (officeByArea) {
+                const matchedArea = officeByArea.areas.find(area => area.includes(term) || area.includes(displayTerm));
+                results = [{
+                    office: officeByArea,
+                    matchType: 'area',
+                    matchName: matchedArea
+                }];
+            } else {
+                // 2. 檢查地段名
+                const sectionMatches = sectionDatabase.filter(s => 
+                    (s.n === term) || 
+                    (s.n + '段' === term) ||
+                    (term.length >= 2 && s.n.includes(term))
+                );
+
+                if (sectionMatches.length > 0) {
+                    const matchedResults = sectionMatches.map(match => {
+                        const office = offices.find(o => o.areas.includes(match.a));
+                        return {
+                            office: office,
+                            matchType: 'section',
+                            matchName: match.n + '段',
+                            relatedArea: match.a
+                        };
+                    });
+                    
+                    const validResults = matchedResults.filter(r => r.office);
+                    if (validResults.length > 0) {
+                        results = validResults;
+                    }
+                }
+            }
+
+            // 3. 顯示結果或提示
+            if (results.length > 0) {
+                renderResults(results);
+            } else {
+                showDefaultView();
+                showSuggestion('查無此地段或行政區。建議輸入「鄉鎮市名稱」(如：吉安、瑞穗) 查詢最為準確。或是您的地段名稱較為特殊，請嘗試輸入前兩個字。');
+            }
+        }
+
+        // 設置快速搜尋
+        function setSearch(val) {
+            searchInput.value = val;
+            handleSearch({ target: { value: val } });
+        }
+
+        // 渲染結果卡片
+        function renderResults(results) {
+            resultsContainer.classList.remove('hidden');
+            defaultContainer.classList.add('hidden');
+            resultsContainer.innerHTML = '';
+
+            // 多筆結果提示
+            if (results.length > 1) {
+                const alertHtml = `
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-4">
+                        <div class="flex">
+                            <i data-lucide="alert-triangle" class="h-5 w-5 text-yellow-600 mr-2"></i>
+                            <p class="text-sm text-yellow-700">
+                                找到 <strong>${results.length}</strong> 筆符合資料。花蓮縣不同鄉鎮可能有同名地段（如：水源段），請依據您的土地位於哪個鄉鎮來判斷。
+                            </p>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.innerHTML += alertHtml;
+            }
+
+            results.forEach(result => {
+                const card = document.createElement('div');
+                card.className = "shadow-xl rounded-2xl overflow-hidden bg-white mb-6";
+                
+                // 決定卡片樣式
+                let matchContent = '';
+                if (result.matchType === 'area') {
+                    matchContent = `您查詢的行政區為 <strong class="text-lg">${result.matchName}</strong>`;
+                } else {
+                    matchContent = `您查詢的地段 <strong class="text-lg">${result.matchName}</strong> 位於 <strong class="text-lg text-teal-700">${result.relatedArea}</strong>`;
+                }
+
+                // 產生行政區列表 HTML
+                const areasHtml = result.office.areas.map(area => {
+                    const isHighlight = area === result.matchName || area === result.relatedArea;
+                    const classes = isHighlight 
+                        ? 'bg-yellow-200 text-yellow-800 font-bold ring-1 ring-yellow-300' 
+                        : 'text-gray-600 bg-gray-100';
+                    return `<span class="text-xs px-2 py-1 rounded ${classes}">${area}</span>`;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="p-4 text-white ${result.office.color} flex justify-between items-center">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider opacity-90 font-semibold">管轄單位</span>
+                            <h2 class="text-2xl font-bold">${result.office.name}</h2>
+                        </div>
+                        <i data-lucide="building-2" class="w-10 h-10 opacity-80"></i>
+                    </div>
+                    
+                    <div class="bg-white border-x border-b border-gray-100">
+                        <div class="p-6">
+                            <div class="mb-6 ${result.office.lightColor} border-l-4 ${result.office.borderColor} p-4 rounded-r">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i data-lucide="info" class="h-5 w-5 text-gray-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-gray-800">
+                                            ${matchContent}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div class="flex items-start">
+                                    <i data-lucide="map-pin" class="w-5 h-5 text-gray-400 mt-1 mr-3"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">地址</p>
+                                        <p class="text-gray-800 font-medium">${result.office.address}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i data-lucide="phone" class="w-5 h-5 text-gray-400 mt-1 mr-3"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">電話</p>
+                                        <a href="tel:${result.office.phone}" class="text-teal-600 font-medium hover:underline font-mono text-lg">
+                                            ${result.office.phone}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start mb-6">
+                                <i data-lucide="building-2" class="w-5 h-5 text-gray-400 mt-1 mr-3"></i>
+                                <div>
+                                    <p class="text-xs text-gray-500">該所完整轄區</p>
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        ${areasHtml}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <a href="${result.office.mapLink}" target="_blank" rel="noreferrer" class="flex-1 bg-teal-600 text-white py-3 px-4 rounded-xl text-center font-medium hover:bg-teal-700 transition flex items-center justify-center gap-2 shadow-sm">
+                                    <i data-lucide="navigation" class="w-4 h-4"></i> 導航前往
+                                </a>
+                                <a href="${result.office.website}" target="_blank" rel="noreferrer" class="flex-1 bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-xl text-center font-medium hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                                    <i data-lucide="external-link" class="w-4 h-4"></i> 官方網站
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // 顯示預設畫面
+        function showDefaultView() {
+            resultsContainer.classList.add('hidden');
+            defaultContainer.classList.remove('hidden');
+            suggestionBox.classList.add('hidden');
+            emptyStateIcon.classList.remove('hidden');
+        }
+
+        // 顯示提示訊息
+        function showSuggestion(msg) {
+            suggestionText.textContent = msg;
+            suggestionBox.classList.remove('hidden');
+            emptyStateIcon.classList.add('hidden');
+        }
+
+        // 渲染底部完整對照表
+        function renderOfficeList() {
+            officeListContainer.innerHTML = offices.map(office => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                    <div class="text-xs font-bold px-2 py-1 text-white rounded w-fit mb-2 ${office.color}">
+                        ${office.name}
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1 pl-1">
+                        ${office.areas.map(area => `
+                            <li class="flex items-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 mr-2"></span>
+                                ${area}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        // 全局函式暴露給 HTML onclick 使用
+        window.setSearch = setSearch;
+    </script>
+</body>
+</html>
