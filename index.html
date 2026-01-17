@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>花蓮縣地政轄區查詢系統</title>
+    <title>玉里地政事務所-花蓮縣地段轄區判斷系統</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -40,7 +40,7 @@
         <div class="container mx-auto px-4 text-center">
             <div class="flex items-center justify-center space-x-3 mb-2">
                 <i data-lucide="map-pin" class="w-8 h-8 text-yellow-300"></i>
-                <h1 class="text-2xl md:text-3xl font-bold tracking-wide">花蓮縣地政管轄查詢系統</h1>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-wide">玉里地政事務所-花蓮縣地段轄區判斷系統</h1>
             </div>
             <p class="text-teal-100 text-sm md:text-base">
                 收錄 2025 年最新地段代碼表，輸入地段或鄉鎮即可查詢
@@ -54,7 +54,7 @@
         <!-- Search Input -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
             <label class="block text-gray-700 text-sm font-bold mb-2 ml-1">
-                請輸入地段名 (如: 民生、太巴塱) 或 鄉鎮名 (如: 吉安)
+                請輸入地段名 (如: 三民、富源) 或 鄉鎮名 (如: 玉里)
             </label>
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -64,7 +64,7 @@
                     type="text"
                     id="searchInput"
                     class="block w-full pl-10 pr-3 py-4 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out text-lg select-text"
-                    placeholder="例如：壽豐、赤科山、六十石山..."
+                    placeholder="例如：玉璞、赤科山、六十石山..."
                     style="-webkit-user-select: text; user-select: text;"
                 />
             </div>
@@ -72,10 +72,10 @@
             <!-- Quick Tags -->
             <div class="mt-4 flex flex-wrap gap-2">
                 <span class="text-xs text-gray-500 self-center mr-1">熱門查詢：</span>
-                <button onclick="setSearch('花蓮市')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">花蓮市</button>
-                <button onclick="setSearch('壽豐')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">壽豐</button>
-                <button onclick="setSearch('鳳林')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">鳳林</button>
-                <button onclick="setSearch('太巴塱')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">太巴塱</button>
+                <button onclick="setSearch('玉璞')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">玉璞</button>
+                <button onclick="setSearch('春日')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">春日</button>
+                <button onclick="setSearch('神社')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">神社</button>
+                <button onclick="setSearch('水源')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">水源</button>
                 <button onclick="setSearch('玉里')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">玉里</button>
                 <button onclick="setSearch('六十石山')" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs hover:bg-teal-100 transition border border-teal-100">六十石山</button>
             </div>
@@ -113,8 +113,8 @@
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm">
-        <p>花蓮縣地政便民查詢系統 (非官方模擬展示)</p>
-        <p class="mt-1 text-xs">資料來源：花蓮/鳳林/玉里地政事務所 114年段別代碼表</p>
+        <p>玉里地政便民查詢系統</p>
+        <p class="mt-1 text-xs">資料來源：各地政事務所 114年段別代碼表</p>
     </footer>
 
     <!-- JavaScript Logic -->
