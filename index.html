@@ -12,6 +12,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
         body {
             font-family: 'Noto Sans TC', sans-serif;
+            /* 禁止選取文字 */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         .fade-in-up {
             animation: fadeInUp 0.5s ease-out forwards;
@@ -58,8 +63,9 @@
                 <input
                     type="text"
                     id="searchInput"
-                    class="block w-full pl-10 pr-3 py-4 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out text-lg"
+                    class="block w-full pl-10 pr-3 py-4 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out text-lg select-text"
                     placeholder="例如：壽豐、赤科山、六十石山..."
+                    style="-webkit-user-select: text; user-select: text;"
                 />
             </div>
             
@@ -113,6 +119,30 @@
 
     <!-- JavaScript Logic -->
     <script>
+        // --- 封鎖右鍵與複製 ---
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            // 封鎖 F12
+            if(e.key === 'F12') {
+                e.preventDefault();
+            }
+            // 封鎖 Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Chrome/Edge 開發者工具)
+            if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+                e.preventDefault();
+            }
+            // 封鎖 Ctrl+U (檢視原始碼)
+            if(e.ctrlKey && e.key === 'U') {
+                e.preventDefault();
+            }
+            // 封鎖 Ctrl+S (存檔)
+            if(e.ctrlKey && e.key === 'S') {
+                e.preventDefault();
+            }
+        });
+
         // --- 資料設定 ---
         const offices = [
             {
