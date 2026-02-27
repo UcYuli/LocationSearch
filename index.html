@@ -373,7 +373,7 @@
             // 2. 檢查地段名 或 地段代碼 (如果是數字則優先匹配代碼)
             const sectionMatches = sectionDatabase.filter(s => {
                 if (isDigitSearch) {
-                    return s.c.startsWith(term); // 數字輸入：從第一個數字開始篩選代碼
+                    return s.c.includes(term) // 數字輸入：從第一個數字開始篩選代碼
                 } else {
                     return s.n.includes(term) || (s.n + '段').includes(term); // 文字輸入：地段名
                 }
