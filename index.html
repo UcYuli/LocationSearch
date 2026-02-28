@@ -168,8 +168,8 @@
             },
         ];
 
-        const sectionDatabase = [
-            // 花蓮市
+        // 範例資料庫
+        const sectionDatabase = [// 花蓮市
 			  { "c": "0001", "n": "豐村", "a": "花蓮市" }, { "c": "0002", "n": "德興", "a": "花蓮市" }, { "c": "0003", "n": "嘉禾", "a": "花蓮市" }, { "c": "0004", "n": "主商", "a": "花蓮市" },
 			  { "c": "0005", "n": "福安", "a": "花蓮市" }, { "c": "0006", "n": "主權", "a": "花蓮市" }, { "c": "0007", "n": "民生", "a": "花蓮市" }, { "c": "0008", "n": "福祥", "a": "花蓮市" },
 			  { "c": "0009", "n": "福德", "a": "花蓮市" }, { "c": "0010", "n": "北濱", "a": "花蓮市" }, { "c": "0011", "n": "林森", "a": "花蓮市" }, { "c": "0012", "n": "國風", "a": "花蓮市" },
@@ -327,6 +327,7 @@
 			  { "c": "0802", "n": "督林", "a": "卓溪鄉" }, { "c": "0803", "n": "新立山", "a": "卓溪鄉" }
         ];
 
+
         // --- DOM 元素 ---
         const searchInput = document.getElementById('searchInput');
         const resultsContainer = document.getElementById('resultsContainer');
@@ -366,37 +367,47 @@
                 results.push({
                     office: office,
                     matchType: 'area',
-                    matchName: matchedArea
+                    matchName: matchedArea,
+                    sortKey: matchedArea // 用於文字排序
                 });
             });
 
-            // 2. 檢查地段名 或 地段代碼 (如果是數字則優先匹配代碼)
+            // 2. 檢查地段名 或 地段代碼
             const sectionMatches = sectionDatabase.filter(s => {
                 if (isDigitSearch) {
-                    return s.c.includes(term) // 數字輸入：從第一個數字開始篩選代碼
+                    return s.c.includes(term) 
                 } else {
-                    return s.n.includes(term) || (s.n + '段').includes(term); // 文字輸入：地段名
+                    return s.n.includes(term) || (s.n + '段').includes(term); 
                 }
             });
 
             sectionMatches.forEach(match => {
                 const office = offices.find(o => o.areas.includes(match.a));
                 if (office) {
-                    // 避免重複
-                    const isDuplicate = results.some(r => r.matchType === 'section' && r.code === match.c && r.matchName === match.n + '段');
+                    const isDuplicate = results.some(r => r.matchType === 'section' && r.code === match.c);
                     if (!isDuplicate) {
                         results.push({
                             office: office,
                             matchType: 'section',
                             matchName: match.n + '段',
                             code: match.c,
-                            relatedArea: match.a
+                            relatedArea: match.a,
+                            sortKey: isDigitSearch ? match.c : match.n // 用於排序
                         });
                     }
                 }
             });
 
-            // 3. 顯示結果
+            // 3. 排序邏輯修正
+            if (isDigitSearch) {
+                // 數字搜尋：依代碼遞增排序
+                results.sort((a, b) => a.code.localeCompare(b.code));
+            } else {
+                // 文字搜尋：依中文筆畫遞增排序 (由左至右比較)
+                results.sort((a, b) => a.matchName.localeCompare(b.matchName, 'zh-Hant-TW'));
+            }
+
+            // 4. 顯示結果
             if (results.length > 0) {
                 renderResults(results, isDigitSearch);
             } else {
@@ -415,7 +426,6 @@
             defaultContainer.classList.add('hidden');
             resultsContainer.innerHTML = '';
 
-            // 筆數提醒
             const alertText = isDigitSearch ? `找到 <strong>${results.length}</strong> 筆代碼開頭為「${searchInput.value}」的地段。` : `找到 <strong>${results.length}</strong> 筆相符資料。`;
             resultsContainer.innerHTML = `
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-4">
