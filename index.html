@@ -48,15 +48,26 @@
     <!-- Header -->
     <header class="bg-teal-700 text-white py-6 md:py-8 shadow-md">
         <div class="container mx-auto px-4 text-center">
-            <!-- 修正後的標題區塊：針對小螢幕優化寬度與縮放 -->
-            <div class="flex items-center justify-center gap-2 mb-3 max-w-[95%] mx-auto">
-                <i data-lucide="map-pin" class="w-6 h-6 md:w-8 md:h-8 text-yellow-300 shrink-0"></i>
-                <h1 class="text-lg sm:text-xl md:text-3xl font-bold tracking-tight md:tracking-wide leading-tight">
+            
+            <!-- 重新設計的標題區塊 -->
+            <!-- 行動端版本：垂直排列，優化斷行與比例 -->
+            <div class="md:hidden flex flex-col items-center gap-3 mb-4">
+                <i data-lucide="map-pin" class="w-12 h-12 text-yellow-300"></i>
+                <h1 class="text-xl font-bold tracking-tight leading-snug">
+                    玉里地政事務所<br>花蓮縣地段轄區判斷系統
+                </h1>
+            </div>
+
+            <!-- PC 桌面端版本：橫向排列，維持 32 吋螢幕協調度 -->
+            <div class="hidden md:flex items-center justify-center gap-4 mb-4">
+                <i data-lucide="map-pin" class="w-8 h-8 text-yellow-300 shrink-0"></i>
+                <h1 class="text-3xl font-bold tracking-wide">
                     玉里地政事務所-花蓮縣地段轄區判斷系統
                 </h1>
             </div>
-            <!-- 副標題區塊：調整內距以適應 6.5 吋手機 -->
-            <p class="text-teal-100 text-[11px] xs:text-xs md:text-base px-1 md:px-2 leading-relaxed opacity-90">
+
+            <!-- 副標題區塊 -->
+            <p class="text-teal-100 text-[11px] xs:text-xs md:text-base px-1 md:px-2 leading-relaxed opacity-90 max-w-lg mx-auto">
                 收錄 2025 年最新地段代碼表，輸入地段、鄉鎮或 <span class="text-yellow-300 font-bold border-b border-yellow-300/30">代碼</span> 即可查詢
             </p>
         </div>
